@@ -1,0 +1,15 @@
+---
+- name: Running REST API
+  hosts: all
+  tasks:
+    - name: Invoking REST API
+      become: yes
+      uri:
+        url: https://18.216.19.92/api/v1/
+        owner: ansible
+        group: ansible
+        mode: "755"
+        user: admin
+        password: ansible@123
+        body_format: json
+        validate_certs: false
