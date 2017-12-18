@@ -2,6 +2,6 @@
 # vars file for dps and fincadservice 
 
 DPS_HOME: '/local/apps/ifs/dps'
-HOME: '/local/apps/fincadservice'
+HOME: '/local/apps/ifs/fincadservice'
 
 
