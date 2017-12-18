@@ -46,14 +46,14 @@
       group: "{{ APP_GROUP }}"
       state: directory
 
-  - name: Downloading the deployment files from artifactory or git repository
-    get_url:
-      url: '{{ SVN_FINSOURCE }}'
-      dest: '{{ TEMP }}'
-      group: "{{ APP_GROUP }}"
-      owner: "{{ APP_OWNER }}"
-      mode: 0777
-      validate_certs: no
+  #- name: Downloading the deployment files from artifactory or git repository
+  #  get_url:
+  #    url: '{{ SVN_FINSOURCE }}'
+  #    dest: '{{ TEMP }}'
+  #    group: "{{ APP_GROUP }}"
+  #    owner: "{{ APP_OWNER }}"
+  #    mode: 0777
+  #    validate_certs: no
 
   - name: Select the build number from zip file downloaded
     shell: ls '{{ TEMP }}/{{ BUILD_FINFILE }}' | awk -F "_" '{print $3}' | awk -F "." '{print $1}'
@@ -325,14 +325,14 @@
       group: "{{ APP_GROUP }}"
       state: directory
 
-  - name: Downloading the deployment files from artifactory or git repository
-    get_url:
-      url: '{{ SVN_SOURCE }}'
-      dest: '{{ TEMP }}'
-      group: "{{ APP_GROUP }}"
-      owner: "{{ APP_OWNER }}"
-      mode: 0777
-      validate_certs: no
+  #- name: Downloading the deployment files from artifactory or git repository
+  #  get_url:
+  #    url: '{{ SVN_SOURCE }}'
+  #    dest: '{{ TEMP }}'
+  #    group: "{{ APP_GROUP }}"
+  #    owner: "{{ APP_OWNER }}"
+  #    mode: 0777
+  #    validate_certs: no
 
   - name: Select the build number from zip file downloaded
     shell: ls '{{ TEMP }}/{{ BUILD_FILE }}' | awk -F "_" '{print $3}' | awk -F "." '{print $1}'
