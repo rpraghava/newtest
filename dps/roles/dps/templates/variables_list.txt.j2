@@ -1,0 +1,72 @@
+The list of variables used for the deployment of the application {{ APP }}
+#              **************************************
+
+#Application description
+APP: '{{ app_name }}'
+FIN_APP: '{{ finapp_name }}'
+JAVA_LOC_ORIG: '{{ JAVA_LOC_ORIG }}'
+env_full_fillment: '{{ env_full_fillment }}'
+PROCESS_NAME: '{{PROCESS_NAME}}'
+APP_PROGRAM_FILE: '{{APP_PROGRAM_FILE}}'
+svn_trunk_url: '{{svn_trunk_url}}'
+
+#DPS application file and directory description
+DPS_HOME: '{{ DPS_HOME }}'
+DPS_APP_HOME: '{{ DPS_HOME }}/{{ APP }}'
+DPS_DIST_DIR: '{{ DPS_HOME }}/dist'
+DPS_DEPLOY_DIR: '{{ DPS_HOME }}/deploy'
+DPS_LOG_DIR: '{{ DPS_APP_HOME }}/logs'
+BUILD_CONFIRMATION_FILE: '{{ DPS_DEPLOY_DIR }}/bin/build_file.txt'
+DPS_APP_LOG_FILE: '{{ DPS_LOG_DIR }}/{{ APP }}.log'
+#APP_PROGRAM_FILE: '{{ APP_HOME }}/bin/{{ APP }}.jar'
+
+#Fincadservice application file and directory description
+HOME: '{{ HOME }}'
+APP_HOME: '{{ APP_HOME }}'
+DIST_DIR: '{{ APP_HOME }}/dist'
+DEPLOY_DIR: '{{ APP_HOME }}/deploy'
+LOG_DIR: '{{ APP_HOME }}/logs'
+BUILD_CONFIRMATION_FILE: '{{ DEPLOY_DIR }}/bin/build_file.txt'
+APP_LOG_FILE: '{{ LOG_DIR }}/{{ APP }}.log'
+#APP_PROGRAM_FILE: '{{ APP_HOME }}/bin/{{ APP }}.jar'
+
+#User details
+APP_OWNER: 'vagrant'
+APP_GROUP: 'vagrant'
+
+#Build description
+BUILD: '{{ build_no }}'
+VERSION: '{{ version_no }}'
+BRANCH: '{{ branch_name }}'
+BUILD_NAME: 'BUILD_{{BUILD}}'
+BUILD_FILE: '{{ APP }}_{{ BUILD_NAME }}.zip'
+MAJ_VER: 
+MIN_VER:
+build: BUILD
+
+#SVN description
+SVN_EXPORT_DIR: '/tmp/{{ APP }}'
+SVN_TRUNK: '{{ svn_trunk_url }}'
+SVN_SOURCE: '{{ SVN_TRUNK }}/{{ BUILD_FILE }}'
+
+#Temp directory and file description
+TEMP_DEPLOY_DIR: '/tmp/{{ APP }}/tempdeploy'
+TEMP_DEPLOY_CONFIRMATION_FILE: '{{ TEMP_DEPLOY_DIR }}/deploy/bin/BUILD'
+log_file: '/tmp/ansible.log'
+
+#Start and Stop job description
+start_job:
+stop_job:
+AUTOSERV: UA1
+AUTOSYS:
+AUTO_SYS_FILE:
+AUTOUSER:
+
+#Extra vars description
+process_name: '{{ PROCESS_NAME }}'
+mail_port: '{{MAIL_PORT}}'
+java_loc: '{{ APP_HOME }}/java'
+
+#Extra vars description
+java_loc_orig: '{{ JAVA_LOC_ORIG }}'
+var_file_name: 'dump_all_vars_dev_ppl.txt'

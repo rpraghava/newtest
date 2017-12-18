@@ -1,0 +1,51 @@
+---
+# vars file for dps and fincadservice 
+
+#Build description
+version_no : 18.0
+branch_name: master
+BUILD: '{{ build_no }}'
+FINBUILD: '{{ finbuild_no }}'
+VERSION: '{{ version_no }}'
+BRANCH: '{{ branch_name }}'
+BUILD_NAME: 'BUILD_{{BUILD}}'
+FINBUILD_NAME: 'BUILD_{{FINBUILD}}'
+BUILD_FILE: '{{ APP }}_{{ BUILD_NAME }}.zip'
+BUILD_FILENAME: '{{ APP }}_{{ BUILD_NAME }}'
+BUILD_FINFILE: '{{ FIN_APP }}_{{ FINBUILD_NAME }}.zip'
+BUILD_FINFILENAME: '{{ FIN_APP }}_{{ FINBUILD_NAME }}'
+MAJ_VER: 
+MIN_VER:
+build: BUILD
+
+#SVN description
+SVN_EXPORT_DIR: '/tmp/{{ APP }}'
+SVN_EXPORT_FINDIR: '/tmp/{{ FIN_APP }}'
+SVN_TRUNK: '{{ svn_trunk_url }}'
+SVN_SOURCE: '{{ SVN_TRUNK }}/{{ BUILD_FILE }}'
+SVN_FINSOURCE: '{{ SVN_TRUNK }}/{{ BUILD_FINFILE }}'
+
+#Temp directory and file description
+TEMP_DEPLOY_DIR: '{{ DPS_DEPLOY_DIR }}/{{ BUILD_FILENAME }}'
+TEMP_DEPLOY_CONFIRMATION_FILE: '{{ TEMP_DEPLOY_DIR }}/bin/build_file.txt'
+TEMP_DEPLOY: '{{ DEPLOY_DIR }}/{{ BUILD_FINFILENAME }}'
+TEMP_DEPLOY_FILE: '{{ TEMP_DEPLOY }}/bin/build_file.txt'
+
+log_file: '/tmp/ansible.log'
+
+
+
+#Start and Stop job description
+start_job:
+stop_job:
+AUTOSERV: UA1
+AUTOSYS:
+AUTO_SYS_FILE:
+AUTOUSER:
+
+#Extra vars description
+process_name: '{{ PROCESS_NAME }}'
+mail_port: '{{ MAIL_PORT }}'
+java_loc: '{{ DPS_APP_HOME }}/java'
+app_port: '{{ APP_PORT }}'
+

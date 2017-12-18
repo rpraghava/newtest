@@ -1,0 +1,11 @@
+#[dev_ppl]
+#peopleservice.com
+
+#[dev_tman]
+#tmanserver.com
+
+#[dev_fincadservice]
+#172.31.13.132
+
+[dev_dps]
+172.31.13.132

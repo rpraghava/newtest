@@ -1,0 +1,10 @@
+---
+# deploy.yml includes deployment stuffs
+
+# Roles defined for People service application
+
+- hosts: dev_dps 
+  remote_user: u42093
+  become: true
+  roles:
+    - { role: dps, when: app_name == "dps" }
