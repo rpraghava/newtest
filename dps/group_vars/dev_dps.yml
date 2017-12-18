@@ -9,6 +9,9 @@ APP_PROGRAM_FILE: '/usr/lib/sendmail'
 svn_trunk_url: 'https://github.com/johnbashas/Ansible/blob/master'
 APP_PORT: 25
 
+DPS_HOME: '/local/apps/ifs/dps'
+HOME: '/local/apps/ifs/fincadservice'
+
 #Application file and directory description
 TEMP: '/tmp/dps'
 DPS_APP_HOME: '{{ DPS_HOME }}/{{ APP }}'
