@@ -3,5 +3,5 @@
   gather_facts: false
   tasks:
     - name: Sample Hello World
-	  shell:
-	    echo "Hello World" > /tmp/file.txt
+      shell:
+        echo "Hello World" > /tmp/file.txt
