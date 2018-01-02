@@ -1,7 +1,7 @@
 ---
 # vars file for dps and fincadservice 
 
-DPS_HOME: '/local/apps/ifs/dps'
-HOME: '/local/apps/ifs/fincadservice'
-
-
+DPS_HOME: '/local/apps/ifs'
+HOME: '/local/apps/ifs'
+log_file_ansible: '/export/home/vagrant/ansible.log'
+TEMP_DEPLOY_DIR: '/tmp/{{ APP }}/tempdeploy'

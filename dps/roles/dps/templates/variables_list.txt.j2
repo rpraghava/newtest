@@ -13,10 +13,10 @@ svn_trunk_url: '{{svn_trunk_url}}'
 #DPS application file and directory description
 DPS_HOME: '{{ DPS_HOME }}'
 DPS_APP_HOME: '{{ DPS_HOME }}/{{ APP }}'
-DPS_DIST_DIR: '{{ DPS_HOME }}/dist'
-DPS_DEPLOY_DIR: '{{ DPS_HOME }}/deploy'
+DPS_DIST_DIR: '{{ DPS_APP_HOME }}/dist'
+DPS_DEPLOY_DIR: '{{ DPS_APP_HOME }}/deploy'
 DPS_LOG_DIR: '{{ DPS_APP_HOME }}/logs'
-BUILD_CONFIRMATION_FILE: '{{ DPS_DEPLOY_DIR }}/bin/build_file.txt'
+BUILD_CONFIRMATION_FILE: '{{ DPS_DEPLOY_DIR }}/bin/BUILD'
 DPS_APP_LOG_FILE: '{{ DPS_LOG_DIR }}/{{ APP }}.log'
 #APP_PROGRAM_FILE: '{{ APP_HOME }}/bin/{{ APP }}.jar'
 
@@ -26,8 +26,9 @@ APP_HOME: '{{ APP_HOME }}'
 DIST_DIR: '{{ APP_HOME }}/dist'
 DEPLOY_DIR: '{{ APP_HOME }}/deploy'
 LOG_DIR: '{{ APP_HOME }}/logs'
-BUILD_CONFIRMATION_FILE: '{{ DEPLOY_DIR }}/bin/build_file.txt'
+BUILD_CONFIRMATION_FILE: '{{ DEPLOY_DIR }}/bin/BUILD'
 APP_LOG_FILE: '{{ LOG_DIR }}/{{ APP }}.log'
+java_finloc: '{{ APP_HOME }}/java'
 #APP_PROGRAM_FILE: '{{ APP_HOME }}/bin/{{ APP }}.jar'
 
 #User details
@@ -50,8 +51,7 @@ SVN_TRUNK: '{{ svn_trunk_url }}'
 SVN_SOURCE: '{{ SVN_TRUNK }}/{{ BUILD_FILE }}'
 
 #Temp directory and file description
-TEMP_DEPLOY_DIR: '/tmp/{{ APP }}/tempdeploy'
-TEMP_DEPLOY_CONFIRMATION_FILE: '{{ TEMP_DEPLOY_DIR }}/deploy/bin/BUILD'
+TEMP_DEPLOY_CONFIRMATION_FILE: '{{ DPS_DEPLOY_DIR }}/bin/BUILD'
 log_file: '/tmp/ansible.log'
 
 #Start and Stop job description

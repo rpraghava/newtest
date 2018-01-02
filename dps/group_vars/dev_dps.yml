@@ -2,28 +2,28 @@
 # defaults file for DPS application
 
 APP: '{{ app_name }}'
-JAVA_LOC_ORIG: '/usr/jdk/instances/jdk1.8.0_74'
+JAVA_LOC_ORIG: '/usr/jdk/jdk1.8.0_131/'
 env_full_fillment: 'DEV-Development'
 PROCESS_NAME: sendmail
 APP_PROGRAM_FILE: '/usr/lib/sendmail'
-svn_trunk_url: 'https://github.com/johnbashas/Ansible/blob/master'
+svn_trunk_url: 'http://10.10.28.37'
 APP_PORT: 25
-
-DPS_HOME: '/local/apps/ifs/dps'
-HOME: '/local/apps/ifs/fincadservice'
 
 #Application file and directory description
 TEMP: '/tmp/dps'
+FIN_TEMP: '/tmp/fincadservice'
 DPS_APP_HOME: '{{ DPS_HOME }}/{{ APP }}'
-DPS_DIST_DIR: '{{ DPS_HOME }}/dist'
-DPS_DEPLOY_DIR: '{{ DPS_HOME }}/deploy'
+DPS_DIST_DIR: '{{ DPS_APP_HOME }}/dist'
+DPS_DEPLOY_DIR: '{{ DPS_APP_HOME }}/deploy'
 DPS_LOG_DIR: '{{ DPS_APP_HOME }}/logs'
-#BUILD_CONFIRMATION_FILE: '{{ DPS_DEPLOY_DIR }}/bin/build.info'
+BUILD_CONFIRMATION_FILE: '{{ DPS_DEPLOY_DIR }}/bin/BUILD'
 DPS_APP_LOG_FILE: '{{ DPS_LOG_DIR }}/{{ APP }}.log'
+PRIMARY_DPS_NAME: dps 
+PRIMARY_DPS_DIR: '{{ DPS_APP_HOME }}/{{ PRIMARY_DPS_NAME }}'
 
 #User details
-APP_OWNER: 'u42093'
-APP_GROUP: 'u42093'
+APP_OWNER: 'vagrant'
+APP_GROUP: 'vagrant'
 
 #Extra vars description
 java_loc_orig: '{{ JAVA_LOC_ORIG }}'
@@ -45,18 +45,18 @@ MAIL_PORT: 25
 # Variable for Fincadservice application.
 
 FIN_APP: '{{ finapp_name }}'
-APP_PROGRAM_FILE: '/usr/lib/sendmail'
 APP_PROGRAM_FILE_RH: '/usr/sbin/sendmail'
-svn_trunk_url: 'https://github.com/johnbashas/Ansible/blob/master'
 
 APP_HOME: '{{ HOME }}/{{ FIN_APP }}'
-DIST_DIR: '{{ HOME }}/dist'
-DEPLOY_DIR: '{{ HOME }}/deploy'
-LOG_DIR: '{{ HOME }}/logs'
-#FIN_BUILD_CONFIRMATION_FILE: '{{ DEPLOY_DIR }}/bin/build.info'
+DIST_DIR: '{{ APP_HOME }}/dist'
+DEPLOY_DIR: '{{ APP_HOME }}/deploy'
+LOG_DIR: '{{ APP_HOME }}/logs'
 APP_LOG_FILE: '{{ LOG_DIR }}/{{ FIN_APP }}.log'
+PRIMARY_FIN_NAME: fincadservice
+PRIMARY_FIN_DIR: '{{ APP_HOME }}/{{ PRIMARY_FIN_NAME }}'
+FIN_BUILD_CONFIRMATION_FILE: '{{ DEPLOY_DIR }}/{{ PRIMARY_FIN_NAME }}/bin/BUILD'
 
-var_file_name: 'dump_all_vars_dev_dps.txt'
+var_file_name: 'dump_all_vars_dev_fincadservice.txt'
 
 fin_email_attachment_success: "{{ LOG_DIR }}/{{ FIN_APP }}_{{ new_build }}_{{ deploy_start_time }}.log"
 fin_email_subject_success: "Deployment Log for {{FIN_APP}}"
@@ -73,16 +73,23 @@ branch_name: master
 BUILD: '{{ build_no }}'
 FINBUILD: '{{ finbuild_no }}'
 VERSION: '{{ version_no }}'
-BRANCH: '{{ branch_name }}'
+#BRANCH: '{{ branch_name }}'
 BUILD_NAME: 'BUILD_{{BUILD}}'
 FINBUILD_NAME: 'BUILD_{{FINBUILD}}'
 BUILD_FILE: '{{ APP }}_{{ BUILD_NAME }}.zip'
 BUILD_FILENAME: '{{ APP }}_{{ BUILD_NAME }}'
 BUILD_FINFILE: '{{ FIN_APP }}_{{ FINBUILD_NAME }}.zip'
 BUILD_FINFILENAME: '{{ FIN_APP }}_{{ FINBUILD_NAME }}'
-MAJ_VER: 
-MIN_VER:
+this_build: "BUILD_{{ BUILD }}"
+MJR_VER: "{{ mjr_ver }}"
+MIN_VER: "{{ min_ver }}"
+SUB_VER: "{{ sub_ver }}"
+SUB_VER2: "{{ sub_ver2 }}"
+BRANCH: "{{ branch }}"
 build: BUILD
+
+AUTOSYS_START: /local/apps/ifs/scripts/autosys_start.sh
+AUTOSYS_STOP: /local/apps/ifs/scripts/autosys_stop.sh
 
 #SVN description
 SVN_EXPORT_DIR: '/tmp/{{ APP }}'
@@ -92,19 +99,16 @@ SVN_SOURCE: '{{ SVN_TRUNK }}/{{ BUILD_FILE }}'
 SVN_FINSOURCE: '{{ SVN_TRUNK }}/{{ BUILD_FINFILE }}'
 
 #Temp directory and file description
-TEMP_DEPLOY_DIR: '{{ DPS_DEPLOY_DIR }}/{{ BUILD_FILENAME }}'
-TEMP_DEPLOY_CONFIRMATION_FILE: '{{ TEMP_DEPLOY_DIR }}/bin/build_file.txt'
-TEMP_DEPLOY: '{{ DEPLOY_DIR }}/{{ BUILD_FINFILENAME }}'
-TEMP_DEPLOY_FILE: '{{ TEMP_DEPLOY }}/bin/build_file.txt'
+#TEMP_DEPLOY_DIR: '{{ DPS_DEPLOY_DIR }}/{{ BUILD_FILENAME }}'
+TEMP_DEPLOY_CONFIRMATION_FILE: '{{ DPS_DEPLOY_DIR }}/{{ PRIMARY_DPS_NAME }}/bin/BUILD'
+#TEMP_DEPLOY: '{{ DEPLOY_DIR }}/{{ BUILD_FINFILENAME }}'
+TEMP_DEPLOY_FILE: '{{ DEPLOY_DIR }}/{{ PRIMARY_FIN_NAME }}/bin/BUILD'
 
-log_file: '/tmp/ansible.log'
+log_file: '/export/home/vagrant/ansible.log'
 
 #Extra vars description
 process_name: '{{ PROCESS_NAME }}'
 mail_port: '{{ MAIL_PORT }}'
 java_loc: '{{ DPS_APP_HOME }}/java'
+java_finloc: '{{ APP_HOME }}/java'
 app_port: '{{ APP_PORT }}'
-
-
-
-

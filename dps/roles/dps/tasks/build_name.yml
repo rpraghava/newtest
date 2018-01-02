@@ -1,0 +1,56 @@
+---
+- name: set this build if major build is not null
+  set_fact:
+    this_build: "{{ this_build }}_V_{{ MJR_VER }}"
+    svn_version_path: "V_{{ MJR_VER }}"
+  when: MJR_VER != "" and mjr_ver is defined
+
+- name: If no major version number, default the svn path to just the build number
+  set_fact:
+    svn_version_path: "{{ BUILD }}"
+  when: MJR_VER == "" and mjr_ver is undefined or MJR_VER == "" and mjr_ver is defined
+
+- name: set this build if minor build is not null
+  set_fact:
+    this_build: "{{ this_build }}_{{ MIN_VER }}"
+    svn_version_path: "{{svn_version_path}}_{{ MIN_VER }}"
+  when: MIN_VER != "" and min_ver is defined
+
+- name: set this build if sub_ver is not null
+  set_fact:
+    this_build: "{{ this_build }}_{{ SUB_VER }}"
+    svn_version_path: "{{svn_version_path}}_{{ SUB_VER }}"
+  when: SUB_VER != "" and sub_ver is defined
+
+- name: set this build if sub_ver2 is not null
+  set_fact:
+    this_build: "{{ this_build }}_{{ SUB_VER2 }}"
+    svn_version_path: "{{svn_version_path}}_{{ SUB_VER2 }}"
+  when: SUB_VER2 != "" and sub_ver2 is defined
+
+- name: set this branch if it is null
+  set_fact:
+    this_build: "{{ this_build }}_R{{ BRANCH }}"
+  when: BRANCH != "" and branch is defined
+
+- name: If BUILD_NAME is null, define it using {{ this_build }}
+  set_fact:
+    BUILD_NAME: "{{ this_build }}"
+  when: BUILD_NAME == "" and build_name is undefined or BUILD_NAME == "" and build_name is defined
+
+- name: create zip file name
+  set_fact:
+    BUILD_FILE: "{{ APP }}_{{ BUILD_NAME }}.zip"
+
+- name: create svn url
+  set_fact:
+    SVN_URL: "{{svn_version_path}}/{{BUILD_FILE}}"
+
+#- name: debug
+#  debug:
+#    msg:
+#      - "This build:- {{this_build}}"
+#      - "SVN_VER_Path:- {{svn_version_path}}"
+#      - "Build Name:- {{BUILD_NAME}}"
+#      - "Build File:- {{BUILD_FILE}}"
+#      - "SVN_SOURCE:- svn_trunk/{{svn_version_path}}/{{BUILD_FILE}}"

@@ -3,8 +3,7 @@
 
 # Roles defined for People service application
 
-- hosts: dev_dps 
-  remote_user: u42093
-  become: true
+# Roles defined for TMANSERVER application
+- hosts: dev_dps
   roles:
     - { role: dps, when: app_name == "dps" }

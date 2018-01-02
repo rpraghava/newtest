@@ -1,6 +1,15 @@
 ---
 # tasks file for deployment
 - block:
+  - name: nullify the ansible log file before the execuition of playbook
+    become: false
+    local_action:
+      module: shell
+      args:
+        "echo > {{ log_file_ansible }}"
+
+  - include: build_name.yml
+
   - debug:
       msg: "**************** The deployment started for {{ FIN_APP }} application on  {{ env_full_fillment }} environment on {{ ansible_date_time.date }}_{{ ansible_date_time.time }} ****************"
 
@@ -10,9 +19,9 @@
 
   - name: Registering the result of deployment folder verification
     stat:
-      path: "{{ HOME }}"
+      path: "{{ APP_HOME }}"
     register: deployment_folder_stat
-
+    
   - name: debug
     debug:
       msg:
@@ -21,23 +30,23 @@
         - "Application Owner - {{ APP_OWNER }}"
         - "Application group - {{ APP_GROUP }}"
         - "Process Name - {{ PROCESS_NAME }}"
-        - "Application Home Path - {{HOME}}"
+        - "Application Home Path - {{APP_HOME}}"
         - "Application Program File - {{APP_PROGRAM_FILE}}"
         - "Deployment Directory - {{DEPLOY_DIR}}"
         - "Java Location - {{ java_loc_orig }}"
         - "Log Location - {{ LOG_DIR }}"
-        - "Build File for deployment - {{ SVN_SOURCE }}"
+        - "Build File for deployment - {{ SVN_FINSOURCE }}"
 
   - name: Stop the execution if deployment folder is not present
     fail:
       msg: File not found!! Please check the deployment folder '{{ APP_HOME }}'
     when: "deployment_folder_stat.stat.exists == False"
 
-  - name: Checking the war file status on artifactory
-    uri:
-      url: "{{ SVN_FINSOURCE }}"
-      status_code: 200
-      validate_certs: no
+#  - name: Checking the war file status on artifactory-
+#    uri:
+#      url: "{{ SVN_FINSOURCE }}"
+#      status_code: 200
+#      validate_certs: no
 
   - name: Create a svn export directory {{ SVN_EXPORT_FINDIR }}
     file:
@@ -46,24 +55,24 @@
       group: "{{ APP_GROUP }}"
       state: directory
 
-  - name: Downloading the deployment files from artifactory or git repository
-    get_url:
-      url: '{{ SVN_FINSOURCE }}'
-      dest: '{{ TEMP }}'
-      group: "{{ APP_GROUP }}"
-      owner: "{{ APP_OWNER }}"
-      mode: 0777
-      validate_certs: no
+#  - name: Downloading the deployment files from artifactory or git repository
+#    get_url:
+#      url: '{{ SVN_FINSOURCE }}'
+#      dest: '{{ FIN_TEMP }}'
+#      group: "{{ APP_GROUP }}"
+#      owner: "{{ APP_OWNER }}"
+#      mode: 0777
+#      validate_certs: no
 
   - name: Select the build number from zip file downloaded
-    shell: ls '{{ TEMP }}/{{ BUILD_FINFILE }}' | awk -F "_" '{print $3}' | awk -F "." '{print $1}'
+    shell: ls '{{ FIN_TEMP }}/{{ BUILD_FINFILE }}' | awk -F "_" '{print $3}' | awk -F "." '{print $1}'
     register: build_num
 
   - name: Getting build number from zip file name
     set_fact:
       new_build: '{{ build }}_{{ build_num.stdout }}'
 
-  - name: Create the new deploy directory {{ DIST_DIR }}
+  - name: Create the new dist directory {{ DIST_DIR }}
     file:
       dest: "{{ DIST_DIR }}"
       state: present
@@ -71,14 +80,15 @@
 
   - name: Copying to fincadservice dist folder
     copy:
-      src: "{{ TEMP }}/{{ BUILD_FINFILE}}"
+      src: "{{ FIN_TEMP }}/{{ BUILD_FINFILE}}"
       dest: "{{ DIST_DIR }}"
       remote_src: yes
 
   - name: Delete the existing deploy directory {{ DEPLOY_DIR }}
     file:
-      dest: "{{ DEPLOY_DIR }}"
+      dest: "{{ DEPLOY_DIR }}/"
       state: absent
+      state: directory
 
   - name: Create the new deploy directory {{ DEPLOY_DIR }}
     file:
@@ -89,27 +99,45 @@
   - name: Extract the zip file to dist folder to get Build details
     unarchive:
       src: "{{ DIST_DIR }}/{{ BUILD_FINFILE }}"
-      dest: "{{ HOME }}"
+      dest: "{{ APP_HOME }}"
       remote_src: yes
       owner: "{{ APP_OWNER }}"
       group: "{{ APP_GROUP }}"
 
   - name: Checking if the directory existing
-    stat:      
-     path: "{{ HOME }}/{{ BUILD_FINFILENAME }}"
+    stat:
+     path: "{{ APP_HOME }}/deploy"
     register: stat_result
-
-  - name: Moving to {{ DEPLOY_DIR }}
-    command: mv "{{ HOME }}/{{ BUILD_FINFILENAME }}" "{{ DEPLOY_DIR }}" 
-    when: stat_result.stat.exists == True
 
   - name: Changing the permission and ownership of entire deployment folder
     file:
-      path: "{{ DEPLOY_DIR }}/{{ BUILD_FINFILENAME }}/"
-      owner: "{{ APP_OWNER }}"
-      group: "{{ APP_GROUP }}"
-      recurse: yes
-      mode: 0755
+     path: "{{ DEPLOY_DIR }}/"
+     owner: "{{ APP_OWNER }}"
+     group: "{{ APP_GROUP }}"
+     recurse: yes
+     mode: 0777
+     state: directory
+
+
+#  - name: Moving folder to deploy folder
+#    copy:
+#      src: "{{ PRIMARY_FIN_DIR }}/"
+#      dest: "{{ DEPLOY_DIR }}"
+#      owner: "{{ APP_OWNER }}"
+#      group: "{{ APP_GROUP }}"
+#      remote_src: yes
+#      mode: 0777
+
+#  - name: Moving folder to deploy folder
+#    file: 
+#    path: "{{ PRIMARY_FIN_DIR }}/" 
+#    dest: "{{ DEPLOY_DIR }}"
+#    state: absent
+#    when: stat_result.stat.exists
+
+  - name: Moving folder to deploy folder
+    shell: mv "{{ PRIMARY_FIN_DIR }}" "{{ DEPLOY_DIR }}"
+    when: stat_result.stat.exists
 
   - name: Getting build number from text file
     slurp:
@@ -154,8 +182,11 @@
   #- name: Stopping the app {{FIN_APP}} through UAT Autosys
   #  command: sendevent -E FORCE_STARTJOB -J test_server
 
-  - name: Stopping the {{PROCESS_NAME}} service
-    service: name={{PROCESS_NAME}} state=stopped
+  #- name: Stopping the {{PROCESS_NAME}} service
+  #  service: name={{PROCESS_NAME}} state=stopped
+  
+  - name: stopping the {{PROCESS_NAME}} service using shell script
+    shell: "sh {{ AUTOSYS_STOP }}" 
 
   - name: Cross checking the pid of the process again for killing the process id
     shell: fuser {{ APP_PROGRAM_FILE }} 2> /dev/null | awk '{ print $1 }'
@@ -165,6 +196,7 @@
   - name: Kill the running processes related to {{ PROCESS_NAME }}
     shell: "kill {{ app_process_id_cross_check.stdout }}"
     when: "app_process_id.stdout == app_process_id_cross_check.stdout"
+    ignore_errors: True
 
   - name: Verifying the {{PROCESS_NAME}} stopped status by checking the port binding status
     wait_for:
@@ -180,21 +212,24 @@
 
   - name: Removing the java symlink from deployment folder
     file:
-      path: "{{ java_loc }}"
+      path: "{{ java_finloc }}"
       state: absent
     when: war_build.msg == new_build
 
   - name: Create java symlink again
     file:
       src: "{{ java_loc_orig }}"
-      dest: "{{ java_loc }}"
+      dest: "{{ java_finloc }}"
       owner: "{{ APP_OWNER }}"
       group: "{{ APP_GROUP }}"
       state: link
     when: war_build.msg == new_build
 
-  - name: Starting the {{PROCESS_NAME}} service after deployment
-    service: name={{ PROCESS_NAME }} state=started
+#  - name: Starting the {{PROCESS_NAME}} service after deployment
+#    service: name={{ PROCESS_NAME }} state=started
+
+  - name: starting the {{PROCESS_NAME}} service after deployment using shell scripts
+    shell: "sh {{ AUTOSYS_START }}"   
 
   - name: Verifying the {{ PROCESS_NAME }} startup status by checking the port binding status and waiting 30 seconds
     wait_for:
@@ -232,7 +267,7 @@
       dest: "{{ SVN_EXPORT_FINDIR }}/{{ var_file_name }}"
       owner: "{{ APP_OWNER }}"
       group: "{{ APP_GROUP }}"
-      mode: 0644
+      mode: 0777
 
   - name: Regsitering all the dum variables to another variable for displaying on screen.
     shell: "cat {{ SVN_EXPORT_FINDIR }}/{{ var_file_name }}"
@@ -246,6 +281,7 @@
     copy:
       src: "{{ log_file }}"
       dest: "{{ LOG_DIR }}/{{ FIN_APP }}_{{ new_build }}_{{ deploy_start_time }}.log"
+      remote_src: yes
 
   #- name: Sending deployment success mail to application ditribuiton list
   #  mail:
@@ -289,7 +325,7 @@
 
   - name: Registering the result of deployment folder verification
     stat:
-      path: "{{ DPS_HOME }}"
+      path: "{{ DPS_APP_HOME }}"
     register: deployment_folder_stat
 
   - name: debug
@@ -300,7 +336,7 @@
         - "Application Owner - {{ APP_OWNER }}"
         - "Application group - {{ APP_GROUP }}"
         - "Process Name - {{ PROCESS_NAME }}"
-        - "Application Home Path - {{DPS_HOME}}"
+        - "Application Home Path - {{DPS_APP_HOME}}"
         - "Application Program File - {{APP_PROGRAM_FILE}}"
         - "Deployment Directory - {{DPS_DEPLOY_DIR}}"
         - "Java Location - {{ java_loc_orig }}"
@@ -312,11 +348,11 @@
       msg: File not found!! Please check the deployment folder '{{ DPS_APP_HOME }}'
     when: "deployment_folder_stat.stat.exists == False"
 
-  - name: Checking the war file status on artifactory
-    uri:
-      url: "{{ SVN_SOURCE }}"
-      status_code: 200
-      validate_certs: no
+#  - name: Checking the war file status on artifactory
+#    uri:
+#      url: "{{ SVN_SOURCE }}"
+#      status_code: 200
+#      validate_certs: no
 
   - name: Create a svn export directory {{ SVN_EXPORT_DIR }}
     file:
@@ -325,14 +361,14 @@
       group: "{{ APP_GROUP }}"
       state: directory
 
-  - name: Downloading the deployment files from artifactory or git repository
-    get_url:
-      url: '{{ SVN_SOURCE }}'
-      dest: '{{ TEMP }}'
-      group: "{{ APP_GROUP }}"
-      owner: "{{ APP_OWNER }}"
-      mode: 0777
-      validate_certs: no
+#  - name: Downloading the deployment files from artifactory or git repository
+#    get_url:
+#      url: '{{ SVN_SOURCE }}'
+#      dest: '{{ TEMP }}'
+#      group: "{{ APP_GROUP }}"
+#      owner: "{{ APP_OWNER }}"
+#      mode: 0777
+#      validate_certs: no
 
   - name: Select the build number from zip file downloaded
     shell: ls '{{ TEMP }}/{{ BUILD_FILE }}' | awk -F "_" '{print $3}' | awk -F "." '{print $1}'
@@ -342,7 +378,7 @@
     set_fact:
       dps_new_build: '{{ build }}_{{ dps_build_num.stdout }}'
 
-  - name: Create the new deploy directory {{ DPS_DIST_DIR }}
+  - name: Create the new dist directory {{ DPS_DIST_DIR }}   
     file:
       dest: "{{ DPS_DIST_DIR }}"
       state: present
@@ -368,27 +404,31 @@
   - name: Extract the zip file to dist folder to get Build details
     unarchive:
       src: "{{ DPS_DIST_DIR }}/{{ BUILD_FILE }}"
-      dest: "{{ DPS_HOME }}"
+      dest: "{{ DPS_APP_HOME }}"
       remote_src: yes
       owner: "{{ APP_OWNER }}"
       group: "{{ APP_GROUP }}"
 
   - name: Checking if the directory existing
     stat:      
-     path: "{{ DPS_HOME }}/{{ BUILD_FILENAME }}"
+     path: "{{ DPS_APP_HOME }}/deploy"
     register: dps_stat_result
-
-  - name: Moving to {{ DPS_DEPLOY_DIR }}
-    command: mv "{{ DPS_HOME }}/{{ BUILD_FILENAME }}" "{{ DPS_DEPLOY_DIR }}" 
-    when: dps_stat_result.stat.exists == True
 
   - name: Changing the permission and ownership of entire deployment folder
     file:
-      path: "{{ DPS_DEPLOY_DIR }}/{{ BUILD_FILENAME }}/"
+      path: "{{ DPS_DEPLOY_DIR }}/"
       owner: "{{ APP_OWNER }}"
       group: "{{ APP_GROUP }}"
       recurse: yes
       mode: 0755
+  
+#  - name: Moving folder to deploy folder
+#    copy:
+#      src: "{{ PRIMARY_DPS_DIR }}/"
+#      dest: "{{ DPS_DEPLOY_DIR }}"
+
+  - name: Moving folder to deploy folder
+    shell: mv "{{ PRIMARY_DPS_DIR }}" "{{ DPS_DEPLOY_DIR }}"
 
   - name: Getting build number from text file
     slurp:
@@ -433,8 +473,11 @@
   #- name: Stopping the app {{APP}} through UAT Autosys
   #  command: sendevent -E FORCE_STARTJOB -J test_server
 
-  - name: Stopping the {{PROCESS_NAME}} service
-    service: name={{PROCESS_NAME}} state=stopped
+  #- name: Stopping the {{PROCESS_NAME}} service
+  #  service: name={{PROCESS_NAME}} state=stopped
+
+  - name: stopping the {{PROCESS_NAME}} service using shell script
+    shell: "sh {{ AUTOSYS_STOP }}"   
 
   - name: Cross checking the pid of the process again for killing the process id
     shell: fuser {{ APP_PROGRAM_FILE }} 2> /dev/null | awk '{ print $1 }'
@@ -444,6 +487,7 @@
   - name: Kill the running processes related to {{ PROCESS_NAME }}
     shell: "kill {{ dps_app_process_id_cross_check.stdout }}"
     when: "dps_app_process_id.stdout == dps_app_process_id_cross_check.stdout"
+    ignore_errors: True
 
   - name: Verifying the {{PROCESS_NAME}} stopped status by checking the port binding status
     wait_for:
@@ -472,8 +516,11 @@
       state: link
     when: dps_war_build.msg == dps_new_build
 
-  - name: Starting the {{PROCESS_NAME}} service after deployment
-    service: name={{ PROCESS_NAME }} state=started
+#  - name: Starting the {{PROCESS_NAME}} service after deployment
+#    service: name={{ PROCESS_NAME }} state=started
+ 
+  - name: starting the {{PROCESS_NAME}} service after deployment using shell scripts
+    shell: "sh {{ AUTOSYS_START }}"
 
   - name: Verifying the {{ PROCESS_NAME }} startup status by checking the port binding status and waiting 30 seconds
     wait_for:
@@ -511,7 +558,7 @@
       dest: "{{ SVN_EXPORT_DIR }}/{{ dps_var_file_name }}"
       owner: "{{ APP_OWNER }}"
       group: "{{ APP_GROUP }}"
-      mode: 0644
+      mode: 0777
 
   - name: Regsitering all the dum variables to another variable for displaying on screen.
     shell: "cat {{ SVN_EXPORT_DIR }}/{{ dps_var_file_name }}"
