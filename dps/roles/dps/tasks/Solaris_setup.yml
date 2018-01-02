@@ -1,12 +1,12 @@
 ---
 # tasks file for deployment
 - block:
-#  - name: nullify the ansible log file before the execuition of playbook
-#    become: false
-#    local_action:
-#      module: shell
-#      args:
-#        "echo > {{ log_file_ansible }}"
+  - name: nullify the ansible log file before the execuition of playbook
+    become: false
+    local_action:
+      module: shell
+      args:
+        "echo > {{ log_file_ansible }}"
 
   - include: build_name.yml
 
@@ -360,7 +360,7 @@
       state: present
       state: directory
 
-  - name: Copying to fincadservice dist folder
+  - name: Copying to dps dist folder
     copy:
       src: "{{ TEMP }}/{{ BUILD_FILE}}"
       dest: "{{ DPS_DIST_DIR }}"
@@ -538,6 +538,7 @@
     copy:
       src: "{{ log_file }}"
       dest: "{{ DPS_LOG_DIR }}/{{ APP }}_{{ dps_new_build }}_{{ deploy_start_time }}.log"
+      remote_src: yes
 
   #- name: Sending deployment success mail to application ditribuiton list
   #  mail:
@@ -561,6 +562,7 @@
       copy:
         src: "{{ log_file }}"
         dest: "{{ DPS_LOG_DIR }}/Failed_Log_{{ APP }}_{{ deploy_start_time }}.log"
+        remote_src: yes
 
   #- name: Sending Failure mail to application ditribuiton list 
   #  mail:
