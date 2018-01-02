@@ -104,6 +104,10 @@
       owner: "{{ APP_OWNER }}"
       group: "{{ APP_GROUP }}"
 
+  - name: Moving folder to deploy folder
+    shell: mv "{{ PRIMARY_FIN_DIR }}" "{{ DEPLOY_DIR }}"
+    when: stat_result.stat.exists
+
   - name: Checking if the directory existing
     stat:
      path: "{{ APP_HOME }}/deploy"
@@ -117,27 +121,6 @@
      recurse: yes
      mode: 0777
      state: directory
-
-
-#  - name: Moving folder to deploy folder
-#    copy:
-#      src: "{{ PRIMARY_FIN_DIR }}/"
-#      dest: "{{ DEPLOY_DIR }}"
-#      owner: "{{ APP_OWNER }}"
-#      group: "{{ APP_GROUP }}"
-#      remote_src: yes
-#      mode: 0777
-
-#  - name: Moving folder to deploy folder
-#    file: 
-#    path: "{{ PRIMARY_FIN_DIR }}/" 
-#    dest: "{{ DEPLOY_DIR }}"
-#    state: absent
-#    when: stat_result.stat.exists
-
-  - name: Moving folder to deploy folder
-    shell: mv "{{ PRIMARY_FIN_DIR }}" "{{ DEPLOY_DIR }}"
-    when: stat_result.stat.exists
 
   - name: Getting build number from text file
     slurp:
