@@ -136,7 +136,7 @@
 #    when: stat_result.stat.exists
 
   - name: Moving folder to deploy folder
-    shell: mv "{{ PRIMARY_FIN_DIR }}/." "{{ DEPLOY_DIR }}"
+    shell: mv "{{ PRIMARY_FIN_DIR }}" "{{ DEPLOY_DIR }}"
     when: stat_result.stat.exists
 
   - name: Getting build number from text file
