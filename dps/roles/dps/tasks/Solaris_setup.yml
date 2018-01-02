@@ -88,8 +88,7 @@
     file:
       dest: "{{ DEPLOY_DIR }}"
       state: absent
-      state: directory
-
+      
   - name: Extract the zip file to dist folder to get Build details
     unarchive:
       src: "{{ DIST_DIR }}/{{ BUILD_FINFILE }}"
