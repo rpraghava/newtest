@@ -86,7 +86,7 @@
 
   - name: Delete the existing deploy directory {{ DEPLOY_DIR }}
     file:
-      dest: "{{ DEPLOY_DIR }}/"
+      dest: "{{ DEPLOY_DIR }}"
       state: absent
       state: directory
 
