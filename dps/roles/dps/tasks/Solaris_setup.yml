@@ -232,13 +232,13 @@
       path: "{{ SVN_EXPORT_FINDIR }}/{{ build }}_{{ build_num.stdout }}"
       state: absent
 
-  - name: Dump all vars for future reference
-    template:
-      src: "variables_list.txt.j2"
-      dest: "{{ SVN_EXPORT_FINDIR }}/{{ var_file_name }}"
-      owner: "{{ APP_OWNER }}"
-      group: "{{ APP_GROUP }}"
-      mode: 0777
+  #- name: Dump all vars for future reference
+  #  template:
+  #    src: "variables_list.txt.j2"
+  #    dest: "{{ SVN_EXPORT_FINDIR }}/{{ var_file_name }}"
+  #    owner: "{{ APP_OWNER }}"
+  #    group: "{{ APP_GROUP }}"
+  #    mode: 0777
 
   - name: Regsitering all the dum variables to another variable for displaying on screen.
     shell: "cat {{ SVN_EXPORT_FINDIR }}/{{ var_file_name }}"
@@ -366,12 +366,6 @@
       dest: "{{ DPS_DEPLOY_DIR }}"
       state: absent
 
-#  - name: Create the new deploy directory {{ DPS_DEPLOY_DIR }}
-#    file:
-#      dest: "{{ DPS_DEPLOY_DIR }}"
-#      state: present
-#      state: directory
-
   - name: Extract the zip file to dist folder to get Build details
     unarchive:
       src: "{{ DPS_DIST_DIR }}/{{ BUILD_FILE }}"
@@ -380,10 +374,8 @@
       owner: "{{ APP_OWNER }}"
       group: "{{ APP_GROUP }}"
 
-  - name: Checking if the directory existing
-    stat:      
-     path: "{{ DPS_APP_HOME }}/deploy"
-    register: dps_stat_result
+  - name: Renaming the folder to deploy folder
+    shell: mv "{{ PRIMARY_DPS_DIR }}" "{{ DPS_DEPLOY_DIR }}"
 
   - name: Changing the permission and ownership of entire deployment folder
     file:
@@ -392,14 +384,6 @@
       group: "{{ APP_GROUP }}"
       recurse: yes
       mode: 0755
-  
-#  - name: Moving folder to deploy folder
-#    copy:
-#      src: "{{ PRIMARY_DPS_DIR }}/"
-#      dest: "{{ DPS_DEPLOY_DIR }}"
-
-  - name: Moving folder to deploy folder
-    shell: mv "{{ PRIMARY_DPS_DIR }}" "{{ DPS_DEPLOY_DIR }}"
 
   - name: Getting build number from text file
     slurp:
@@ -523,13 +507,13 @@
       path: "{{ SVN_EXPORT_DIR }}/{{ build }}_{{ dps_build_num.stdout }}"
       state: absent
 
-  - name: Dump all vars for future reference
-    template:
-      src: "variables_list.txt.j2"
-      dest: "{{ SVN_EXPORT_DIR }}/{{ dps_var_file_name }}"
-      owner: "{{ APP_OWNER }}"
-      group: "{{ APP_GROUP }}"
-      mode: 0777
+#  - name: Dump all vars for future reference
+#    template:
+#      src: "variables_list.txt.j2"
+#      dest: "{{ SVN_EXPORT_DIR }}/{{ dps_var_file_name }}"
+#      owner: "{{ APP_OWNER }}"
+#      group: "{{ APP_GROUP }}"
+#      mode: 0777
 
   - name: Regsitering all the dum variables to another variable for displaying on screen.
     shell: "cat {{ SVN_EXPORT_DIR }}/{{ dps_var_file_name }}"
