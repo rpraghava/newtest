@@ -231,27 +231,33 @@
       path: "{{ SVN_EXPORT_FINDIR }}/{{ build }}_{{ build_num.stdout }}"
       state: absent
 
-  #- name: Dump all vars for future reference
-  #  template:
-  #    src: "variables_list.txt.j2"
-  #    dest: "{{ SVN_EXPORT_FINDIR }}/{{ var_file_name }}"
-  #    owner: "{{ APP_OWNER }}"
-  #    group: "{{ APP_GROUP }}"
-  #    mode: 0777
+  - name: Create the log directory {{ LOG_DIR }}
+    file:
+      dest: "{{ LOG_DIR }}"
+      state: present
+      state: directory
 
-  #- name: Regsitering all the dum variables to another variable for displaying on screen.
-  #  shell: "cat {{ SVN_EXPORT_FINDIR }}/{{ var_file_name }}"
-  #  register: dump_vars_list
+  - name: Dump all vars for future reference
+    template:
+      src: "variables_list.txt.j2"
+      dest: "{{ SVN_EXPORT_FINDIR }}/{{ var_file_name }}"
+      owner: "{{ APP_OWNER }}"
+      group: "{{ APP_GROUP }}"
+      mode: 0777
 
-  #- debug: msg="{{ dump_vars_list.stdout_lines }}"
+  - name: Regsitering all the dum variables to another variable for displaying on screen.
+    shell: "cat {{ SVN_EXPORT_FINDIR }}/{{ var_file_name }}"
+    register: dump_vars_list
 
-  #- debug: msg="The deployment completed for {{ FIN_APP }} application on {{ ansible_date_time.date }}_{{ ansible_date_time.time }}"
+  - debug: msg="{{ dump_vars_list.stdout_lines }}"
 
-  #- name: Renaming log file to {{ FIN_APP }}_{{ new_build }}_{{ ansible_date_time.date }}_{{ ansible_date_time.time }}
-  #  copy:
-   #   src: "{{ log_file }}"
-    #  dest: "{{ LOG_DIR }}/{{ FIN_APP }}_{{ new_build }}_{{ deploy_start_time }}.log"
-     # remote_src: yes
+  - debug: msg="The deployment completed for {{ FIN_APP }} application on {{ ansible_date_time.date }}_{{ ansible_date_time.time }}"
+
+  - name: Renaming log file to {{ FIN_APP }}_{{ new_build }}_{{ ansible_date_time.date }}_{{ ansible_date_time.time }}
+    copy:
+      src: "{{ log_file }}"
+      dest: "{{ LOG_DIR }}/{{ FIN_APP }}_{{ new_build }}_{{ deploy_start_time }}.log"
+      remote_src: yes
 
   #- name: Sending deployment success mail to application ditribuiton list
   #  mail:
@@ -506,26 +512,32 @@
       path: "{{ SVN_EXPORT_DIR }}/{{ build }}_{{ dps_build_num.stdout }}"
       state: absent
 
-#  - name: Dump all vars for future reference
-#    template:
-#      src: "variables_list.txt.j2"
-#      dest: "{{ SVN_EXPORT_DIR }}/{{ dps_var_file_name }}"
-#      owner: "{{ APP_OWNER }}"
-#      group: "{{ APP_GROUP }}"
-#      mode: 0777
+  - name: Create the log directory {{ DPS_LOG_DIR }}
+    file:
+      dest: "{{ DPS_LOG_DIR }}"
+      state: present
+      state: directory
 
-#  - name: Regsitering all the dum variables to another variable for displaying on screen.
-#    shell: "cat {{ SVN_EXPORT_DIR }}/{{ dps_var_file_name }}"
-#    register: dps_dump_vars_list
+  - name: Dump all vars for future reference
+    template:
+      src: "variables_list.txt.j2"
+      dest: "{{ SVN_EXPORT_DIR }}/{{ dps_var_file_name }}"
+      owner: "{{ APP_OWNER }}"
+      group: "{{ APP_GROUP }}"
+      mode: 0777
 
-#  - debug: msg="{{ dps_dump_vars_list.stdout_lines }}"
+  - name: Regsitering all the dum variables to another variable for displaying on screen.
+    shell: "cat {{ SVN_EXPORT_DIR }}/{{ dps_var_file_name }}"
+    register: dps_dump_vars_list
 
-#  - debug: msg="The deployment completed for {{ APP }} application on {{ ansible_date_time.date }}_{{ ansible_date_time.time }}"
+  - debug: msg="{{ dps_dump_vars_list.stdout_lines }}"
 
-  #- name: Renaming log file to {{ APP }}_{{ dps_new_build }}_{{ ansible_date_time.date }}_{{ ansible_date_time.time }}
-  #  copy:
-  #    src: "{{ log_file }}"
-  #    dest: "{{ DPS_LOG_DIR }}/{{ APP }}_{{ dps_new_build }}_{{ deploy_start_time }}.log"
+  - debug: msg="The deployment completed for {{ APP }} application on {{ ansible_date_time.date }}_{{ ansible_date_time.time }}"
+
+  - name: Renaming log file to {{ APP }}_{{ dps_new_build }}_{{ ansible_date_time.date }}_{{ ansible_date_time.time }}
+    copy:
+      src: "{{ log_file }}"
+      dest: "{{ DPS_LOG_DIR }}/{{ APP }}_{{ dps_new_build }}_{{ deploy_start_time }}.log"
 
   #- name: Sending deployment success mail to application ditribuiton list
   #  mail:
@@ -540,15 +552,15 @@
   #    charset: utf8
   #  delegate_to: localhost
 
-  #- debug: msg="The deployment completed for {{ APP }} application and email sent successfully"
+  - debug: msg="The deployment completed for {{ APP }} application and email sent successfully"
 
-  #rescue:
-   # - debug: msg="The deployment seems to be incompleted in one of the steps please check the log files for more info"
+  rescue:
+    - debug: msg="The deployment seems to be incompleted in one of the steps please check the log files for more info"
 
-    #- name: Renaming log file to {{ APP }}_{{ deploy_start_time }} incase of failure
-     # copy:
-      #  src: "{{ log_file }}"
-       # dest: "{{ DPS_LOG_DIR }}/Failed_Log_{{ APP }}_{{ deploy_start_time }}.log"
+    - name: Renaming log file to {{ APP }}_{{ deploy_start_time }} incase of failure
+      copy:
+        src: "{{ log_file }}"
+        dest: "{{ DPS_LOG_DIR }}/Failed_Log_{{ APP }}_{{ deploy_start_time }}.log"
 
   #- name: Sending Failure mail to application ditribuiton list 
   #  mail:
@@ -558,4 +570,3 @@
   #    body: '{{ email_body_failed }}'
   #    from: "{{ DIST_LIST }}"
   #    to: "{{ DIST_LIST }}"
- 
