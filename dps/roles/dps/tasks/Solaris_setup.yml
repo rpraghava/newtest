@@ -90,12 +90,6 @@
       state: absent
       state: directory
 
-#  - name: Create the new deploy directory {{ DEPLOY_DIR }}
-#    file:
-#      dest: "{{ DEPLOY_DIR }}"
-#      state: present
-#      state: directory
-
   - name: Extract the zip file to dist folder to get Build details
     unarchive:
       src: "{{ DIST_DIR }}/{{ BUILD_FINFILE }}"
@@ -104,15 +98,9 @@
       owner: "{{ APP_OWNER }}"
       group: "{{ APP_GROUP }}"
 
-  - name: Moving folder to deploy folder
+  - name: Rename the folder to deploy folder
     shell: mv "{{ PRIMARY_FIN_DIR }}" "{{ DEPLOY_DIR }}"
-    when: stat_result.stat.exists
-
-  - name: Checking if the directory existing
-    stat:
-     path: "{{ APP_HOME }}/deploy"
-    register: stat_result
-
+    
   - name: Changing the permission and ownership of entire deployment folder
     file:
      path: "{{ DEPLOY_DIR }}/"
