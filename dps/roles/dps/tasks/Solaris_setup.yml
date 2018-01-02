@@ -1,12 +1,12 @@
 ---
 # tasks file for deployment
 - block:
-  - name: nullify the ansible log file before the execuition of playbook
-    become: false
-    local_action:
-      module: shell
-      args:
-        "echo > {{ log_file_ansible }}"
+#  - name: nullify the ansible log file before the execuition of playbook
+#    become: false
+#    local_action:
+#      module: shell
+#      args:
+#        "echo > {{ log_file_ansible }}"
 
   - include: build_name.yml
 
